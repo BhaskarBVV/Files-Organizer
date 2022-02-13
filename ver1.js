@@ -1,5 +1,6 @@
-let input = process.argv.slice(2); //input as : node editor.js organize 'D:\codes\Editors\test'
+let input = process.argv.slice(2); //input as : node editor.js organise 'D:\codes\Editors\test'
 let cmd = input[0];
+const { dir } = require('console');
 const fs = require('fs');
 const { type } = require('os');
 const path = require('path');
@@ -26,7 +27,7 @@ let types = {
 };
 switch (cmd) {
     case "tree":
-        console.log("Tree implemented");
+        treefn(input[1])
         break;
     case "organize":
         organizeFn(input[1])
@@ -108,4 +109,28 @@ function sendfiles(SrcPathOfFile, Destpath, file_category) {
 
     fs.copyFileSync(SrcPathOfFile, DestpathOfFile);
     fs.unlinkSync(SrcPathOfFile);
+}
+
+function treefn(dirPath) {
+    if (dirPath == undefined) {
+        console.log("please enter a valid path");
+    }
+    else {
+        let doesExsit = fs.existsSync(dirPath);
+        if (doesExsit == true)
+            treeHelper(dirPath, " ");
+    }
+}
+function treeHelper(targetPath, indent) {
+    let isFile = fs.lstatSync(targetPath).isFile();
+    if (isFile == true) {
+        console.log(indent + "├──" + path.basename(targetPath))
+    }
+    else {
+        console.log(indent + "└──" + path.basename(targetPath));
+        let children = fs.readdirSync(targetPath);
+        for (let i = 0; i < children.length; i++) {
+            treeHelper(path.join(targetPath, children[i]), "\t" + indent);
+        }
+    }
 }
